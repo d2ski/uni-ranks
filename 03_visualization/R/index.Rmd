@@ -1,0 +1,511 @@
+---
+title: "Which countries’ universities are ranked the best?"
+subtitle: "Looking at the world university rankings since 2014, comparing different countries and checking the trends and patterns in ranks distribution."
+output:
+  html_document: 
+    self_contained: no
+    css: "style.css"
+    includes:
+      in_header: favicon.html
+      before_body: header.html
+      after_body: footer.html
+editor_options: 
+  chunk_output_type: inline
+knit: (function(inputFile, encoding) { 
+      out_dir <- '../output';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'index.html')) })
+---
+
+```{r packages, include=FALSE}
+library(tidyverse)
+library(patchwork)
+
+library(hrbrthemes)
+library(RColorBrewer)
+library(scales)
+
+library(showtext)
+font_add(family = "IBMPlexSans-Medium", regular = "../fonts/plex-sans/IBMPlexSans-Medium.ttf")
+font_add(family = "IBMPlexSans-Bold", regular = "../fonts/plex-sans/IBMPlexSans-Bold.ttf")
+font_add(family = "IBMPlexSans-Light", regular = "../fonts/plex-sans/IBMPlexSans-Light.ttf")
+font_add(family = "IBMPlexSans-Regular", regular = "../fonts/plex-sans/IBMPlexSans-Regular.ttf")
+font_add(family = "IBMPlexSans-Text", regular = "../fonts/plex-sans/IBMPlexSans-Text.ttf")
+font_add(family = "IBMPlexSans-Thin", regular = "../fonts/plex-sans/IBMPlexSans-Thin.ttf")
+font_add(family = "IBMPlexSans", regular = "../plex-sans/IBMPlexSans-Regular.ttf")
+showtext_auto()
+
+knitr::opts_chunk$set(dev = "ragg_png", dpi = 72, out.width = "93%")
+```
+
+### Major world university rankings and their methology
+
+There are plenty of different university rankings available out there. University rankings are popular and attract a lot of attention in the field these days not only from the public or media, but even some governments use them as targets in their programs, like 'Project 5-100' in Russia.
+
+Despite variety of existing rankings the following three are considered the most widely observed:
+
++ Times Higher Education World University Rankings, further denoted by [THE]{.lbl-info};
++ The Academic Ranking of World Universities, also known as the Shanghai Ranking, [ARWU]{.lbl-info};
++ QS World University Rankings, [QS]{.lbl-info}.
+
+All these rankings are published annually.
+
+Even though QS and THE rankings have a common origin (from 2004 up to 2009 it was a single ranking but it was divided into two different entities in 2010), there are significant differences in methodologies used for calculation of these three.
+
+In general an university rank depends on ranking score which is produced by weighted sum of some set of specific indicators. But each ranking defines its own constituents: different indicators categories, different number of indicators used, different indicators’ weights and different indicators’ sources (expert surveys or objective data).
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+methodology <- read_csv("../data/methodology.csv")
+
+meth_summary <- methodology %>%
+  group_by(Ranking, Source) %>%
+  summarise(Weight = sum(Weight)) %>%
+  rename(Variable = Source) %>%
+  mutate(View = "Source") %>%
+  bind_rows(
+    methodology %>%
+      group_by(Ranking, Type1) %>%
+      summarise(Weight = sum(Weight)) %>%
+      rename(Variable = Type1) %>%
+      mutate(View = "Type")
+  )
+```
+
+```{r ranks-methodology-func, message=FALSE, warning=FALSE, include=FALSE}
+plot_meth_row <- function(ranking_name) {
+  
+  meth_types <- c(
+    "Teaching",
+    "Citations",
+    "International outlook",
+    "Research",
+    "Other"
+  )
+  
+  pal_name = "Set2"
+  
+  # Indicators weights barplot
+  g_meth_base <- ggplot(filter(methodology, Ranking == ranking_name), aes(
+      x = reorder(Indicator, Weight),
+      y = Weight,
+      #linetype = Source,
+      #color = Type1
+    )) +
+    geom_col(position = "dodge", width = 0.6, fill = "#B4B0B7") +
+    geom_point(
+                 aes(
+                    x = reorder(Indicator, Weight),
+                    y = -2,
+                    fill = Type1,
+                    color = Type1
+                  ),
+                 shape = 21,
+                 size = 1.5
+    ) +
+    #scale_linetype_manual(values = c("Survey" = "dashed", "Data" = "solid")) +
+    #scale_color_manual(values = c("black","black")) +
+    scale_color_brewer(palette = pal_name, limits = meth_types) +
+    scale_fill_brewer(palette = pal_name, limits = meth_types) +
+    scale_x_discrete(labels = label_wrap(35)) +
+    scale_y_continuous(
+      breaks=seq(0, 100, by=20), limits = c(-2, 100),
+      label = function(x) {return(paste(x, "%"))}
+      ) +
+    #ylim(c(-2, 100)) +
+    coord_flip() +
+    theme_ipsum_ps(grid="X", axis="") +
+    theme(
+      legend.position = "none",
+      plot.margin = margin(10, 10, 5, 10, unit="pt"),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.title.position = "plot",
+      plot.title = element_text(family = "IBMPlexSans-Medium", size = 12)
+    ) +
+    guides(color = "none", fill = "none", linetype = "none") +
+    labs(title = paste(ranking_name, "indicators weighting"))
+  
+  # Indicators Source stacked bar plot
+  g_src_base <- ggplot(
+      filter(meth_summary, (Ranking == ranking_name) & (View=="Source")),
+      aes(x = "Indicators Data Source", y = Weight, linetype = Variable)
+    ) +
+      geom_col(position = "stack", fill = "white", color = "black", size = 0.4) +
+      scale_linetype_manual(values = c("Survey" = "dashed", "Data" = "solid")) +
+      scale_y_continuous(breaks=seq(0, 100, by=20), limits = c(-2, 100)) +
+      #ylim(c(-2, 100)) +
+      coord_flip() +
+      theme_ipsum_ps(grid="", axis="") +
+      theme(
+        legend.position = "none",
+        plot.margin = margin(0, 10, 0, 10, unit="pt"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank()
+      )
+  
+  # Indicators Types stacked bar plot
+  g_type_base <- ggplot(
+      filter(meth_summary, (Ranking == ranking_name) & (View=="Type")),
+      aes(x = "Indicators Category", y = Weight, fill = Variable, color = Variable)
+    ) +
+      geom_col(position = "stack") +
+      scale_fill_brewer(palette = pal_name, limits = meth_types) +
+      scale_color_brewer(palette = pal_name, limits = meth_types) +
+      scale_y_continuous(
+        breaks=seq(0, 100, by=20), limits = c(-2, 100),
+        label = function(x) {return(paste(x, "%"))}
+        ) +
+      #ylim(c(-2, 100)) +
+      coord_flip() +
+      theme_ipsum_ps(grid="X", axis="") +
+      theme(
+        plot.margin = margin(0, 10, 0, 10, unit="pt"),
+        axis.title.y = element_blank(),
+        plot.title = element_blank()
+      )
+  
+  g_meth_row <- g_meth_base  + g_src_base + g_type_base + plot_layout(
+    ncol=1,
+    heights = unit(c(150, 12, 12), c("null", "pt", "pt"))
+  )
+  
+  return(g_meth_row)
+}
+
+#plot_meth_row("THE")
+```
+
+```{r ranks-methodology-plot, echo=FALSE, fig.height=13, fig.width=9, fig.showtext=TRUE}
+meth_plots <- lapply(
+  c("ARWU", "QS", "THE"),
+  plot_meth_row
+)
+
+wrap_plots(meth_plots) +
+  plot_layout(
+    ncol = 1,
+    heights = unit(c(1, 1, 1.85), "null"),
+    guides = 'collect'
+  ) +
+  plot_annotation(
+    title = "What's the difference?",
+    subtitle = "Major rankings indicators and their weighting in the ranking's final score",
+    theme = theme(
+        plot.title = element_text(
+            size = 18,
+            family = "IBMPlexSans-Bold",
+            margin = margin(t = 15, b = 10)
+          ),
+        plot.subtitle = element_text(
+            size = 13,
+            family = "IBMPlexSans-Light",
+            margin = margin(b = 15)
+          )
+      )
+  ) & theme(
+    legend.position = 'bottom',
+    legend.justification  = 'center',
+    legend.direction = 'horizontal',
+    legend.margin = margin(15, 0, 15, 0, unit = "pt"),
+    legend.key.size = unit(10, 'pt'),
+    plot.margin = margin(5, 5, 10, 5, unit = "pt"),
+    legend.title = element_blank()
+  )
+  
+```
+
+As it can be seen from above THE tries to assess more indicators than QS or ARWU and assigns more weight to [citations]{.lbl-citations} indicator than other rankings. On the other hand ARWU uses only objective [data]{.lbl-data} indicators, while QS heavily relies on expert [surveys]{.lbl-survey}.
+
+### Countries with the most number of places in major university rankings
+
+The motivation for this visualization was the idea of finding out what countries get the best ranks from the major university rankings (ARWU, THE, QS) and checking if there are any trends in ranks distribution per country. For this purpose university ranks from all three rankings were counted for each country in total. Rankings tables were limited to TOP-500 rank places and rankings published from 2014 to 2021 were used only.
+
+```{r data-prep, include=FALSE}
+country_scores <- read_csv("../data/country_scores500.csv")
+scores <- read_csv("../data/scores500.csv")
+
+country_scores <- country_scores %>%
+  mutate(
+    Country = replace(Country, Country == "Taiwan, Province of China", "Taiwan"),
+    Country = replace(Country, Country == "Korea, Republic of", "South Korea"),
+  )
+
+scores <- scores %>%
+  mutate(
+    Country = replace(Country, Country == "Taiwan, Province of China", "Taiwan"),
+    Country = replace(Country, Country == "Korea, Republic of", "South Korea"),
+  )
+
+ranks_pct <- country_scores %>%
+  group_by(Country) %>%
+  summarise(total_count = sum(RankCount))
+
+ranks_pct <- ranks_pct %>%
+  mutate(count_pct = total_count / sum(total_count) * 100) %>%
+  filter(count_pct >= 1) %>%
+  arrange(count_pct) %>%
+  mutate(Country = factor(Country, levels=Country))
+```
+
+```{r top-countries, echo=FALSE, fig.height=8, fig.width=9, fig.showtext=TRUE}
+g <- ggplot(ranks_pct, aes(x = Country, y = count_pct)) +
+      geom_bar(stat='identity', fill = "#B4B0B7", color = "#B4B0B7", width = 0.6) + 
+      geom_hline(
+        aes(yintercept = c(5)), linetype = "dashed", size = 0.4, color = "firebrick"
+      ) +
+      coord_flip()
+
+g + theme_ipsum_ps(grid="X", axis="") +
+    labs(
+      title = "Only four countries hold at least 5 % of places \nin THE, QS and ARWU rankings combined",
+      subtitle = "Countries with at least 1% of places in TOP-500 of three major rankings since 2014",
+      x = element_blank(),
+      y = "% of places"
+    ) +
+    scale_y_continuous(
+        label = function(x) {return(paste(x, "%"))},
+        limits = c(0, 30),
+        breaks = c(0, 5, 10, 20, 30)
+      ) +
+    theme(
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+      plot.margin = margin(30, 5, 30, 10, unit = "pt")
+      )
+```
+
+So United States by a huge margin got the most number of places within TOP-500 ranks across all three major rankings combined. Almost 1/4 of all rank places were occupied by United States universities since 2014. With a simple threshold of 5%, other leading countries are the UK, Germany, and China.
+
+
+```{r ranks-year-plot, include=FALSE}
+top_scores <- country_scores %>%
+  filter(Country %in% ranks_pct$Country) %>%
+  mutate(Country = factor(Country, levels = rev(ranks_pct$Country), ordered = TRUE))
+
+ranks_by_year <- scores %>%
+  filter(Country %in% ranks_pct$Country) %>%
+  mutate(Country = factor(Country, levels = rev(ranks_pct$Country), ordered = TRUE)) %>%
+  group_by(Country, Year) %>%
+  summarise(
+    breaks = tail(
+        hist(
+          Rank,
+          plot=FALSE,
+          breaks = seq(0, 500, by=50),
+        )$breaks,
+        -1
+      ),
+    counts = hist(
+          Rank,
+          plot=FALSE,
+          breaks = seq(0, 500, by=50),
+        )$counts / n() * 100
+  ) %>%
+  mutate(
+    counts = replace(counts, counts == 0.0, NA)
+  )
+```
+
+```{r plot-func, include=FALSE}
+#country_names_list <- as.character(ranks_pct$Country) 
+
+plot_tile <- function(country_name_idx, country_names_list, y_lim_ranks=NA) {
+  year_breaks <- c(2014, 2016, 2018, 2020, 2022)
+  year_strfmt <- function(x) {return(paste("’", str_sub(x, 3, 4), sep="")) }
+  
+  country_name <- country_names_list[country_name_idx]
+
+  y_title_pct <- if ((country_name_idx %% 3) == 1) "Ranks range" else ""
+  y_title_ranks <- if ((country_name_idx %% 3) == 1) "# of places in TOP-500" else ""
+  x_title_ranks <- if ((country_name_idx %% 3) == 1) "Year" else ""
+  
+  baseplot_percent <- ggplot(
+      filter(ranks_by_year, Country == country_name),
+      aes(x = as.factor(Year), y = breaks, fill = counts, color = counts)
+    ) +
+    geom_tile(size=0.3) +
+    scale_y_reverse(
+      breaks = seq(50, 500, by=50)
+    ) +
+    coord_cartesian(ylim = c(500, 50)) +
+    scale_fill_stepsn(
+      n.breaks = 5,
+      colors = brewer.pal(5, "PuRd"),
+      limits = range(c(0, 50)), show.limits = TRUE,
+      na.value = "transparent"
+    ) +
+    scale_color_stepsn(
+      n.breaks = 5,
+      colors = brewer.pal(5, "PuRd"),
+      limits = range(c(0, 50)), show.limits = TRUE,
+      na.value = "transparent"
+    ) +
+    scale_x_discrete(
+      label = year_strfmt,
+      breaks = year_breaks
+    ) +
+    guides(
+      fill = guide_coloursteps(title.position = "top"),
+      color = "none"
+    ) +
+    theme_ipsum_ps(grid="Y", axis="") +
+    theme(
+      plot.margin = margin(35, 20, 5, 0, "pt"),
+      plot.title = element_text(family = "IBMPlexSans-Medium", size = 12),
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks = element_blank(),
+      legend.direction = "horizontal",
+      legend.margin = margin(0, 0, 0, 15, "pt")
+    ) +
+    labs(
+      title = country_name,
+      y = y_title_pct,
+      x = NULL,
+      fill = "Ranked %"
+    )
+    
+  
+  baseplot_ranks <- ggplot(
+      filter(top_scores, Country == country_name),
+      aes(x = Year, y = RankCount, color = Source)
+    ) +
+    geom_point() +
+    geom_line(size = 0.4) +
+    scale_color_brewer(palette = "Set2") +
+    theme_ipsum_ps(grid="XY", axis="") +
+    scale_x_continuous(
+      label = year_strfmt,
+      breaks = year_breaks
+    ) +
+    expand_limits(y = c(0, y_lim_ranks)) +
+    guides(
+      color = guide_legend(title.position = "top")
+    ) +
+    theme(
+      plot.margin = margin(0, 20, 15, 0, "pt"),
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
+      legend.direction = "horizontal",
+      legend.margin = margin(110, 0, 0, 15, "pt")
+    ) +
+    labs(
+      x = x_title_ranks,
+      y = y_title_ranks,
+      color = "Ranking"
+    )
+  
+  baseplot_tile <- wrap_plots(
+    baseplot_percent,
+    baseplot_ranks,
+    ncol = 1, nrow = 2
+  )
+  
+  return(baseplot_tile)
+}
+```
+
+```{r include=FALSE}
+
+countries_top <- c(
+  "United States",
+  "United Kingdom",
+  "Germany",
+  "China"
+)
+
+countries_rest <- c(
+  "Australia",
+  "France",
+  "Italy",
+  "Canada",
+  "Japan",
+  "Netherlands",
+  "South Korea",
+  "Sweden",
+  "Spain",
+  "Switzerland",
+  "Taiwan",
+  "Belgium",
+  "Russian Federation",
+  "Finland",
+  "Hong Kong",
+  "Austria",
+  "New Zealand",
+  "Denmark"           
+)
+
+plots_top <- lapply(
+  seq_along(countries_top),
+  plot_tile,
+  country_names_list = countries_top,
+  y_lim_ranks = 150
+)
+
+plots_rest <- lapply(
+  seq_along(countries_rest),
+  plot_tile,
+  country_names_list = countries_rest,
+  y_lim_ranks = 35
+)
+```
+
+
+```{r plot-top-countries, echo=FALSE, fig.height=12, fig.width=9, fig.showtext=TRUE}
+wrap_plots(plots_top) +
+  plot_layout(ncol = 3, guides = 'collect') +
+  plot_annotation(
+    title = "China is chasing the leading countries,\nbut still holds bottom ranks mostly",
+    subtitle = "Universities ranks distribution and number of places in major rankings TOP-500 per each year",
+    theme = theme(
+        plot.title = element_text(
+            size = 18,
+            family = "IBMPlexSans-Bold",
+            margin = margin(t = 15, b = 10)
+          ),
+        plot.subtitle = element_text(
+            size = 13,
+            family = "IBMPlexSans-Light",
+            margin = margin(b = 15)
+          )
+      )
+  ) & theme(
+    legend.justification = 'top',
+    plot.margin = margin(5, 5, 10, 5, unit = "pt"),
+  )
+```
+
+Though some sort of a downtrend can be seen in the total number of places occupied by US universities in majors' TOP-500 for the past few years, US universities still tend to represent the world's TOP-50 mostly. [From 20% to 30%]{.lbl-20-30-range} of the US universities presented in the rankings were ranked in TOP-50. On the other hand, China's gaining positions, but according to ARWU ranking mostly. 
+
+Also some points are worthy of note when looking at other than leading countries.
+
+Despite a relatively small number of universities presented in TOP-500 across all rankings for the Netherlands, dutch universities tend to occupy higher ranks. The same pattern can be seen for Switzerland and Hong Kong. Note *# of places in TOP-500 axis* is of different scale range now.
+
+```{r plot-rest-countries, echo=FALSE, fig.height=36, fig.width=9, fig.showtext=TRUE}
+wrap_plots(plots_rest) +
+  plot_layout(ncol = 3, guides = 'collect') +
+  plot_annotation(
+    title = "What about the rest?",
+    subtitle = "Universities ranks distribution and number of places in major rankings TOP-500 per each year",
+    theme = theme(
+        plot.title = element_text(
+            size = 18,
+            family = "IBMPlexSans-Bold",
+            margin = margin(t = 15, b = 10)
+          ),
+        plot.subtitle = element_text(
+            size = 13,
+            family = "IBMPlexSans-Light",
+            margin = margin(b = 15)
+          )
+      )
+  ) & theme(
+    legend.justification = 'top',
+    plot.margin = margin(5, 5, 10, 5, unit = "pt"),
+  )
+```
+
+
+

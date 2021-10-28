@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  font-size: 16px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  margin-top: 410px;
+  margin-bottom: 130px;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+}
+
+h3 {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+p {
+  font-weight: 400;
+}
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  background-color: #dd1c77;
+  background-image: linear-gradient(45deg, #d7b5d8 16.67%, #212121 16.67%, #212121 33.33%, #dd1c77 33.33%, #dd1c77 50%, #d7b5d8 50%, #d7b5d8 66.67%, #212121 66.67%, #212121 83.33%, #dd1c77 83.33%, #dd1c77 100%);
+  background-size: 84.85px 84.85px;
+  color: #000;
+  padding: 10px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#header {
+  display: none;
+}
+
+header .header-intro {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 960px;
+  background-color: #d7b5d8;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 25px;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  background-color: #424242;
+  padding: 10px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+footer .footer {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 960px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  color: #BDBDBD;
+}
+
+footer svg {
+  width: 26px;
+  height: 26px;
+  stroke: #BDBDBD;
+}
+
+.footer span.text, .footer a {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+@media screen and (max-width: 320px) {
+  header .header-intro {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0px;
+    padding-bottom: 15px;
+  }
+}
+
+ul {
+  list-style-type: circle;
+}
+
+.lbl-info {
+  background-color: #BDBDBD;
+  color: #212121;
+  font-weight: bold;
+  padding: 0px 5px 0px 5px;
+  border-radius: 3px;
+}
+
+.lbl-citations {
+  background-color: #fc8d62;
+  color: #fff;
+  font-weight: bold;
+  padding: 0px 5px 0px 5px;
+  border-radius: 3px;
+}
+
+.lbl-survey {
+  font-weight: bold;
+  padding: 0px 5px 0px 5px;
+  border-radius: 3px;
+  border: 1px dashed #212121;
+}
+
+.lbl-data {
+  font-weight: bold;
+  padding: 0px 5px 0px 5px;
+  border-radius: 3px;
+  border: 1px solid #212121;
+}
+
+.lbl-20-30-range {
+  background-color: #df65b0;
+  color: #fff;
+  font-weight: bold;
+  padding: 0px 5px 0px 5px;
+  border-radius: 3px;
+}

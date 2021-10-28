@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Which countries’ universities are ranked the best?</title>
+
+<script src="index_files/header-attrs-2.11/header-attrs.js"></script>
+<script src="index_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<link href="index_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="index_files/highlightjs-9.12.0/highlight.js"></script>
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+<header>
+  <div class="header-intro">
+    <h1 class="title">Which countries’ universities are ranked the best?</h1>
+    <p class="h3">Looking at the world university rankings since 2014, comparing different countries and checking the trends and patterns in ranks distribution.</p>
+  </div>
+</header>
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Which countries’ universities are ranked the best?</h1>
+<h3 class="subtitle">Looking at the world university rankings since 2014, comparing different countries and checking the trends and patterns in ranks distribution.</h3>
+
+</div>
+
+
+<div id="major-world-university-rankings-and-their-methology" class="section level3">
+<h3>Major world university rankings and their methology</h3>
+<p>There are plenty of different university rankings available out there. University rankings are popular and attract a lot of attention in the field these days not only from the public or media, but even some governments use them as targets in their programs, like ‘Project 5-100’ in Russia.</p>
+<p>Despite variety of existing rankings the following three are considered the most widely observed:</p>
+<ul>
+<li>Times Higher Education World University Rankings, further denoted by <span class="lbl-info">THE</span>;</li>
+<li>The Academic Ranking of World Universities, also known as the Shanghai Ranking, <span class="lbl-info">ARWU</span>;</li>
+<li>QS World University Rankings, <span class="lbl-info">QS</span>.</li>
+</ul>
+<p>All these rankings are published annually.</p>
+<p>Even though QS and THE rankings have a common origin (from 2004 up to 2009 it was a single ranking but it was divided into two different entities in 2010), there are significant differences in methodologies used for calculation of these three.</p>
+<p>In general an university rank depends on ranking score which is produced by weighted sum of some set of specific indicators. But each ranking defines its own constituents: different indicators categories, different number of indicators used, different indicators’ weights and different indicators’ sources (expert surveys or objective data).</p>
+<p><img src="index_files/figure-html/ranks-methodology-plot-1.png" width="93%" /></p>
+<p>As it can be seen from above THE tries to assess more indicators than QS or ARWU and assigns more weight to <span class="lbl-citations">citations</span> indicator than other rankings. On the other hand ARWU uses only objective <span class="lbl-data">data</span> indicators, while QS heavily relies on expert <span class="lbl-survey">surveys</span>.</p>
+</div>
+<div id="countries-with-the-most-number-of-places-in-major-university-rankings" class="section level3">
+<h3>Countries with the most number of places in major university rankings</h3>
+<p>The motivation for this visualization was the idea of finding out what countries get the best ranks from the major university rankings (ARWU, THE, QS) and checking if there are any trends in ranks distribution per country. For this purpose university ranks from all three rankings were counted for each country in total. Rankings tables were limited to TOP-500 rank places and rankings published from 2014 to 2021 were used only.</p>
+<p><img src="index_files/figure-html/top-countries-1.png" width="93%" /></p>
+<p>So United States by a huge margin got the most number of places within TOP-500 ranks across all three major rankings combined. Almost 1/4 of all rank places were occupied by United States universities since 2014. With a simple threshold of 5%, other leading countries are the UK, Germany, and China.</p>
+<p><img src="index_files/figure-html/plot-top-countries-1.png" width="93%" /></p>
+<p>Though some sort of a downtrend can be seen in the total number of places occupied by US universities in majors’ TOP-500 for the past few years, US universities still tend to represent the world’s TOP-50 mostly. <span class="lbl-20-30-range">From 20% to 30%</span> of the US universities presented in the rankings were ranked in TOP-50. On the other hand, China’s gaining positions, but according to ARWU ranking mostly.</p>
+<p>Also some points are worthy of note when looking at other than leading countries.</p>
+<p>Despite a relatively small number of universities presented in TOP-500 across all rankings for the Netherlands, dutch universities tend to occupy higher ranks. The same pattern can be seen for Switzerland and Hong Kong. Note <em># of places in TOP-500 axis</em> is of different scale range now.</p>
+<p><img src="index_files/figure-html/plot-rest-countries-1.png" width="93%" /></p>
+</div>
+
+<footer>
+  <div class="footer">
+    <span class="text">Source code and dataset at </span> 
+    <a href="https://github.com/d2ski" target="_blank" rel="noopener noreferrer me" title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+        </path>
+    </svg>
+    </a>
+  </div>
+</footer>
+
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
