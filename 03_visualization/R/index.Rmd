@@ -357,7 +357,7 @@ plot_tile <- function(country_name_idx, country_names_list, y_lim_ranks=NA) {
       axis.title.x = element_blank(),
       axis.text.x = element_blank(),
       axis.ticks = element_blank(),
-      legend.direction = "horizontal",
+      legend.direction = "verical",
       legend.margin = margin(0, 0, 0, 15, "pt")
     ) +
     labs(
@@ -388,8 +388,8 @@ plot_tile <- function(country_name_idx, country_names_list, y_lim_ranks=NA) {
       plot.margin = margin(0, 20, 15, 0, "pt"),
       plot.title = element_blank(),
       plot.subtitle = element_blank(),
-      legend.direction = "horizontal",
-      legend.margin = margin(110, 0, 0, 15, "pt")
+      legend.direction = "verical",
+      legend.margin = margin(100, 0, 0, 15, "pt")
     ) +
     labs(
       x = x_title_ranks,
@@ -453,7 +453,7 @@ plots_rest <- lapply(
 ```
 
 
-```{r plot-top-countries, echo=FALSE, fig.height=12, fig.width=9, fig.showtext=TRUE}
+```{r plot-top-countries, echo=FALSE, fig.height=13, fig.width=9, fig.showtext=TRUE}
 wrap_plots(plots_top) +
   plot_layout(ncol = 3, guides = 'collect') +
   plot_annotation(
@@ -472,8 +472,11 @@ wrap_plots(plots_top) +
           )
       )
   ) & theme(
-    legend.justification = 'top',
     plot.margin = margin(5, 5, 10, 5, unit = "pt"),
+    legend.position = 'right',
+    legend.justification  = 'top',
+    legend.direction = 'vertical',
+    legend.title = element_text(margin = margin(b = 5))
   )
 ```
 
@@ -483,7 +486,7 @@ Also some points are worthy of note when looking at other than leading countries
 
 Despite a relatively small number of universities presented in TOP-500 across all rankings for the Netherlands, dutch universities tend to occupy higher ranks. The same pattern can be seen for Switzerland and Hong Kong. Note *# of places in TOP-500 axis* is of different scale range now.
 
-```{r plot-rest-countries, echo=FALSE, fig.height=36, fig.width=9, fig.showtext=TRUE}
+```{r plot-rest-countries, echo=FALSE, fig.height=39, fig.width=9, fig.showtext=TRUE}
 wrap_plots(plots_rest) +
   plot_layout(ncol = 3, guides = 'collect') +
   plot_annotation(
@@ -502,8 +505,11 @@ wrap_plots(plots_rest) +
           )
       )
   ) & theme(
-    legend.justification = 'top',
     plot.margin = margin(5, 5, 10, 5, unit = "pt"),
+    legend.position = 'right',
+    legend.justification  = 'top',
+    legend.direction = 'vertical',
+    legend.title = element_text(margin = margin(b = 5))
   )
 ```
 

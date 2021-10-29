@@ -92,11 +92,11 @@ footer svg {
   display: inline-block;
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (max-width: 360px) {
   header .header-intro {
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-top: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
     padding-bottom: 15px;
   }
 }
